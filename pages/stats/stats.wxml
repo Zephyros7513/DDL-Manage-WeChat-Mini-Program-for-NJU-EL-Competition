@@ -1,0 +1,74 @@
+<view class="page">
+  <view class="dashboard">
+    <view class="metric main">
+      <text>{{stats.finishRate}}%</text>
+      <view>完成率</view>
+    </view>
+    <view class="metric">
+      <text>{{stats.open}}</text>
+      <view>待办</view>
+    </view>
+    <view class="metric">
+      <text>{{stats.urgent}}</text>
+      <view>高压</view>
+    </view>
+    <view class="metric">
+      <text>{{stats.overdue}}</text>
+      <view>逾期</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">学习压力概览</view>
+    <view class="insight-grid">
+      <view class="insight card">
+        <view class="insight-num">{{stats.pressure}}</view>
+        <view class="insight-label">压力指数</view>
+      </view>
+      <view class="insight card">
+        <view class="insight-num">{{stats.longTaskRate}}%</view>
+        <view class="insight-label">长期任务拆解率</view>
+      </view>
+      <view class="insight card">
+        <view class="insight-num">{{stats.teamProgress}}%</view>
+        <view class="insight-label">团队平均进度</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">任务类型分布</view>
+    <view class="card chart">
+      <block wx:for="{{typeBars}}" wx:key="type">
+        <view class="bar-row">
+          <text>{{item.type}}</text>
+          <view class="bar-track">
+            <view class="bar-fill" style="width: {{item.percent}}%; background: {{item.color}};"></view>
+          </view>
+          <text>{{item.count}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">未来 7 天负载</view>
+    <view class="card week-load">
+      <view class="day-load {{item.levelClass}}" wx:for="{{weekLoads}}" wx:key="date">
+        <view class="day-name">{{item.label}}</view>
+        <view class="day-bar">
+          <view class="day-fill" style="height: {{item.height}}%;"></view>
+        </view>
+        <view class="day-count">{{item.count}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">本周建议</view>
+    <view class="suggestion card" wx:for="{{suggestions}}" wx:key="title">
+      <view class="suggest-title">{{item.title}}</view>
+      <view class="muted">{{item.body}}</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/schedule/schedule",
+    "pages/calendar/calendar",
+    "pages/stats/stats",
+    "pages/team/team"
+  ],
+  "window": {
+    "navigationBarTitleText": "DDL",
+    "navigationBarBackgroundColor": "#f7f5ef",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f5ef"
+  },
+  "tabBar": {
+    "color": "#7c756c",
+    "selectedColor": "#146b63",
+    "backgroundColor": "#fffdfa",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "任务"
+      },
+      {
+        "pagePath": "pages/calendar/calendar",
+        "text": "日历"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "分析"
+      },
+      {
+        "pagePath": "pages/team/team",
+        "text": "协作"
+      }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

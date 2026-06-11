@@ -1,0 +1,43 @@
+<view class="page">
+  <view class="month-head">
+    <view>
+      <view class="eyebrow">日历负载</view>
+      <view class="month-title">{{monthTitle}}</view>
+    </view>
+    <view class="legend">
+      <text class="dot low"></text><text>轻松</text>
+      <text class="dot mid"></text><text>偏满</text>
+      <text class="dot high"></text><text>拥挤</text>
+    </view>
+  </view>
+
+  <view class="week-row">
+    <text wx:for="{{weeks}}" wx:key="*this">{{item}}</text>
+  </view>
+
+  <view class="calendar card">
+    <block wx:for="{{days}}" wx:key="date">
+      <view class="day {{item.todayClass}} {{item.loadClass}}" bindtap="selectDate" data-date="{{item.date}}">
+        <text class="num">{{item.day}}</text>
+        <view class="load" wx:if="{{item.count}}">{{item.count}}</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>{{selectedDate}} 的任务</text>
+      <text class="muted">{{selectedTasks.length}} 项</text>
+    </view>
+    <block wx:if="{{selectedTasks.length}}">
+      <view class="mini-task card" wx:for="{{selectedTasks}}" wx:key="id">
+        <view>
+          <view class="mini-title">{{item.title}}</view>
+          <view class="muted">{{item.type}} · {{item.dueTime}} · 预计 {{item.estimateHours}}h</view>
+        </view>
+        <text class="pill {{item.level.className}}">{{item.level.text}}</text>
+      </view>
+    </block>
+    <view class="empty card" wx:else>这天没有 DDL，可以安排长期任务的推进块。</view>
+  </view>
+</view>

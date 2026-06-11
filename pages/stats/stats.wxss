@@ -1,0 +1,137 @@
+.dashboard {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 16rpx;
+}
+
+.metric {
+  min-height: 160rpx;
+  padding: 22rpx;
+  border-radius: 14rpx;
+  background: #fffdfa;
+  color: #665d50;
+  box-shadow: 0 8rpx 22rpx rgba(48, 44, 35, 0.06);
+}
+
+.metric text {
+  display: block;
+  margin-bottom: 12rpx;
+  color: #146b63;
+  font-size: 48rpx;
+  font-weight: 850;
+}
+
+.metric.main {
+  background: #143f3b;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.metric.main text {
+  color: #f2d06b;
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16rpx;
+}
+
+.insight {
+  min-height: 150rpx;
+  padding: 22rpx;
+}
+
+.insight-num {
+  color: #146b63;
+  font-size: 42rpx;
+  font-weight: 850;
+}
+
+.insight-label {
+  margin-top: 10rpx;
+  color: #665d50;
+  font-size: 23rpx;
+  line-height: 1.25;
+}
+
+.chart {
+  padding: 22rpx;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 110rpx 1fr 48rpx;
+  gap: 14rpx;
+  align-items: center;
+  min-height: 64rpx;
+  color: #4f4a43;
+  font-size: 25rpx;
+}
+
+.bar-track {
+  height: 18rpx;
+  overflow: hidden;
+  border-radius: 18rpx;
+  background: #ede6da;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 18rpx;
+}
+
+.week-load {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12rpx;
+  padding: 20rpx 16rpx;
+}
+
+.day-load {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.day-name,
+.day-count {
+  color: #665d50;
+  font-size: 21rpx;
+}
+
+.day-bar {
+  display: flex;
+  align-items: flex-end;
+  width: 32rpx;
+  height: 150rpx;
+  margin: 12rpx 0 8rpx;
+  overflow: hidden;
+  border-radius: 16rpx;
+  background: #ede6da;
+}
+
+.day-fill {
+  width: 100%;
+  border-radius: 16rpx;
+  background: #a7d7bd;
+}
+
+.day-load.medium .day-fill {
+  background: #f2bf4e;
+}
+
+.day-load.heavy .day-fill {
+  background: #d96b52;
+}
+
+.suggestion {
+  margin-bottom: 16rpx;
+  padding: 22rpx;
+}
+
+.suggest-title {
+  margin-bottom: 8rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+}

@@ -1,0 +1,89 @@
+<view class="page">
+  <view class="schedule-head">
+    <view>
+      <view class="eyebrow">手动课表</view>
+      <view class="schedule-title">本周课表</view>
+      <view class="schedule-sub">点击空白格录入课程、地点和教师，数据会保存在本机。</view>
+    </view>
+    <button class="mini-btn danger-btn" bindtap="clearSchedule">清空</button>
+  </view>
+
+  <view class="toolbar card">
+    <button class="mini-btn" bindtap="goBack">返回任务页</button>
+    <button class="mini-btn" bindtap="fillExample">示例填充</button>
+    <button class="mini-btn" bindtap="exportText">复制课表</button>
+  </view>
+
+  <scroll-view scroll-x class="schedule-scroll">
+    <view class="schedule-grid">
+      <view class="corner">节次</view>
+      <view class="day-head" wx:for="{{days}}" wx:key="key">
+        <text>{{item.name}}</text>
+      </view>
+
+      <block wx:for="{{scheduleRows}}" wx:for-item="row" wx:key="key">
+        <view class="period-cell">
+          <view class="period-name">第{{row.period.index}}节</view>
+          <view class="period-time">{{row.period.time}}</view>
+        </view>
+        <block wx:for="{{row.cells}}" wx:for-item="cell" wx:key="day">
+          <view class="course-cell {{cell.filledClass}}" bindtap="openCourseEditor" data-day="{{cell.day}}" data-period="{{cell.period}}">
+            <view wx:if="{{cell.name}}">
+              <view class="course-name">{{cell.name}}</view>
+              <view class="course-meta">{{cell.room}}</view>
+              <view class="course-meta">{{cell.teacher}}</view>
+            </view>
+            <view wx:else class="empty-cell">+</view>
+          </view>
+        </block>
+      </block>
+    </view>
+  </scroll-view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>今日课程</text>
+      <text class="muted">{{todayCourses.length}} 节</text>
+    </view>
+    <block wx:if="{{todayCourses.length}}">
+      <view class="today-card card" wx:for="{{todayCourses}}" wx:key="period">
+        <view>
+          <view class="today-title">第{{item.period}}节 · {{item.name}}</view>
+          <view class="muted">{{item.time}} · {{item.room}} · {{item.teacher}}</view>
+        </view>
+      </view>
+    </block>
+    <view class="empty card" wx:else>今天还没有录入课程。</view>
+  </view>
+
+  <view class="editor-mask" wx:if="{{showEditor}}">
+    <view class="editor card">
+      <view class="editor-head">
+        <view class="editor-title">{{editorTitle}}</view>
+        <button class="close-btn" bindtap="closeEditor">×</button>
+      </view>
+      <view class="field">
+        <text>课程名称</text>
+        <input value="{{courseDraft.name}}" data-field="name" bindinput="onCourseInput" placeholder="如 高等数学" />
+      </view>
+      <view class="field-row">
+        <view class="field half">
+          <text>上课地点</text>
+          <input value="{{courseDraft.room}}" data-field="room" bindinput="onCourseInput" placeholder="如 教学楼 A203" />
+        </view>
+        <view class="field half">
+          <text>任课教师</text>
+          <input value="{{courseDraft.teacher}}" data-field="teacher" bindinput="onCourseInput" placeholder="如 王老师" />
+        </view>
+      </view>
+      <view class="field">
+        <text>备注</text>
+        <input value="{{courseDraft.note}}" data-field="note" bindinput="onCourseInput" placeholder="如 双周、实验课、需带教材" />
+      </view>
+      <view class="editor-actions">
+        <button class="mini-btn delete-btn" bindtap="deleteCourse">删除本节</button>
+        <button class="btn save-btn" bindtap="saveCourse">保存课程</button>
+      </view>
+    </view>
+  </view>
+</view>

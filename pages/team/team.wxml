@@ -1,0 +1,165 @@
+<view class="page">
+  <view class="team-hero">
+    <view>
+      <view class="eyebrow">团队看板</view>
+      <view class="team-title">{{activeTeam.name}}</view>
+      <view class="team-sub">{{activeTeam.members.length}} 人 · {{sharedTasks.length}} 个共享任务</view>
+    </view>
+    <button class="btn invite" bindtap="copyInvite">邀请</button>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>团队空间</text>
+    </view>
+    <view class="team-tools">
+      <view class="tool-card edit-members" bindtap="openMemberEditor">
+        <view class="tool-icon">员</view>
+        <view class="tool-title">编辑成员</view>
+        <view class="tool-sub">维护组员名单</view>
+      </view>
+      <view class="tool-card new-team" bindtap="openTeamEditor">
+        <view class="tool-icon">组</view>
+        <view class="tool-title">新建团队</view>
+        <view class="tool-sub">课程组 / 竞赛组</view>
+      </view>
+    </view>
+    <scroll-view scroll-x class="team-tabs">
+      <view class="team-tab {{item.activeClass}}" wx:for="{{teams}}" wx:key="id" bindtap="selectTeam" data-id="{{item.id}}">
+        {{item.name}}
+      </view>
+    </scroll-view>
+    <view class="member-strip card">
+      <view class="member" wx:for="{{activeTeam.members}}" wx:key="name">
+        <view class="avatar">{{item.avatar}}</view>
+        <text>{{item.name}}</text>
+      </view>
+      <button class="member-add" bindtap="addMember">+</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>共享任务</text>
+      <button class="mini-btn" bindtap="openNewSharedTask">新建协作</button>
+    </view>
+    <view class="team-progress card">
+      <view>
+        <view class="progress-title">团队进度</view>
+        <view class="muted">{{doneCount}} / {{sharedTasks.length}} 个任务完成 · 平均 {{teamProgress}}%</view>
+      </view>
+      <view class="progress-num">{{teamProgress}}%</view>
+    </view>
+    <block wx:if="{{sharedTasks.length}}">
+      <view class="shared card" wx:for="{{sharedTasks}}" wx:key="id">
+        <view class="shared-top">
+          <view>
+            <view class="shared-title">{{item.title}}</view>
+            <view class="muted">{{item.type}} · {{item.dueDate}} {{item.dueTime}}</view>
+          </view>
+          <text class="pill {{item.level.className}}">{{item.level.text}}</text>
+        </view>
+        <view class="members">
+          <text wx:for="{{item.assigneeNames}}" wx:key="*this">{{item}}</text>
+        </view>
+        <view class="step-board">
+          <view class="team-step {{step.doneClass}}" wx:for="{{item.teamSteps}}" wx:for-item="step" wx:for-index="stepIndex" wx:key="name" bindtap="toggleStep" data-task-id="{{item.id}}" data-index="{{stepIndex}}">
+            <text>{{step.name}}</text>
+            <view>{{step.owner}}</view>
+          </view>
+        </view>
+        <view class="bar">
+          <view class="bar-fill" style="width: {{item.progress}}%;"></view>
+        </view>
+        <view class="shared-actions">
+          <button class="mini-btn" bindtap="openSharedTaskEditor" data-id="{{item.id}}">编辑</button>
+          <button class="mini-btn" bindtap="copyTaskBrief" data-id="{{item.id}}">复制摘要</button>
+          <button class="mini-btn delete-btn" bindtap="removeFromTeam" data-id="{{item.id}}">移出协作</button>
+        </view>
+      </view>
+    </block>
+    <view class="empty card" wx:else>还没有共享任务，在任务页把任务设为“加入团队协作”，或点击下面的校园模板快速创建。</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">校园模板</view>
+    <view class="template-tip">点击模板后先进入编辑页，可修改任务名称、负责人和阶段分工。</view>
+    <view class="template-grid">
+      <view class="template card" wx:for="{{templates}}" wx:key="title" bindtap="useTemplate" data-index="{{index}}">
+        <view class="template-icon">{{item.icon}}</view>
+        <view class="template-title">{{item.title}}</view>
+        <view class="muted">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="editor-mask" wx:if="{{showTeamEditor}}">
+    <view class="team-editor card">
+      <view class="editor-head">
+        <view class="editor-title">{{teamEditorTitle}}</view>
+        <button class="close-btn" bindtap="closeTeamEditor">×</button>
+      </view>
+      <view class="field">
+        <text>团队名称</text>
+        <input value="{{teamDraft.name}}" data-field="name" bindinput="onTeamInput" placeholder="如 竞赛小组、课程论文组" />
+      </view>
+      <view class="field">
+        <text>成员，使用顿号或逗号分隔</text>
+        <input value="{{teamDraft.memberText}}" data-field="memberText" bindinput="onTeamInput" placeholder="如 我、林同学、周同学" />
+      </view>
+      <button class="btn save-btn" bindtap="saveTeam">保存团队</button>
+    </view>
+  </view>
+
+  <view class="editor-mask" wx:if="{{showTaskEditor}}">
+    <view class="team-editor card task-editor">
+      <view class="editor-head">
+        <view class="editor-title">{{taskEditorTitle}}</view>
+        <button class="close-btn" bindtap="closeTaskEditor">×</button>
+      </view>
+      <view class="field">
+        <text>任务名称</text>
+        <input value="{{taskDraft.title}}" data-field="title" bindinput="onTaskInput" placeholder="如 竞赛计划书、课程展示" />
+      </view>
+      <view class="field-row">
+        <view class="field half">
+          <text>任务类型</text>
+          <picker mode="selector" range="{{typeOptions}}" value="{{taskTypeIndex}}" bindchange="onTaskTypeChange">
+            <view class="picker-value">{{taskDraft.type}}</view>
+          </picker>
+        </view>
+        <view class="field half">
+          <text>预计耗时 {{taskEstimateLabel}}</text>
+          <slider min="1" max="80" step="1" value="{{taskEstimateUnits}}" bindchange="onTaskHoursChange" activeColor="#146b63" block-color="#146b63" />
+        </view>
+      </view>
+      <view class="field-row">
+        <view class="field half">
+          <text>截止日期</text>
+          <picker mode="date" value="{{taskDraft.dueDate}}" bindchange="onTaskDateChange">
+            <view class="picker-value">{{taskDraft.dueDate}}</view>
+          </picker>
+        </view>
+        <view class="field half">
+          <text>截止时间</text>
+          <picker mode="time" value="{{taskDraft.dueTime}}" bindchange="onTaskTimeChange">
+            <view class="picker-value">{{taskDraft.dueTime}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="field">
+        <text>负责人，使用顿号或逗号分隔</text>
+        <input value="{{taskDraft.assigneeText}}" data-field="assigneeText" bindinput="onTaskInput" placeholder="如 我、林同学、周同学" />
+      </view>
+      <view class="field">
+        <text>阶段分工，每行一个阶段：阶段名｜负责人｜状态</text>
+        <textarea value="{{taskDraft.stepsText}}" data-field="stepsText" bindinput="onTaskInput" placeholder="资料调研｜林同学｜未完成&#10;PPT 制作｜周同学｜已完成"></textarea>
+      </view>
+      <view class="field">
+        <text>整体进度 {{taskDraft.progress}}%</text>
+        <slider min="0" max="100" step="5" value="{{taskDraft.progress}}" bindchange="onTaskProgressChange" activeColor="#146b63" block-color="#146b63" />
+      </view>
+      <button class="btn save-btn" bindtap="saveSharedTask">保存协作任务</button>
+    </view>
+  </view>
+</view>

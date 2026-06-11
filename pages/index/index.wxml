@@ -1,0 +1,190 @@
+<view class="page">
+  <view class="hero">
+    <view>
+      <view class="eyebrow">今天 {{todayLabel}}</view>
+      <view class="hero-title">把混乱截止任务排成可执行计划</view>
+      <view class="hero-sub">待完成 {{summary.open}} 项，最高压力 {{summary.highest}}</view>
+    </view>
+    <view class="score-ring">
+      <text>{{summary.pressure}}</text>
+      <view>压力值</view>
+    </view>
+  </view>
+
+  <view class="quick card">
+    <view class="quick-actions">
+      <button class="btn ghost-btn" bindtap="openNewTaskEditor">
+        <text>新建任务</text>
+        <view>课程 / 竞赛 / 作业</view>
+      </button>
+      <button class="btn schedule-btn" bindtap="openSchedule">
+        <text>手动课表</text>
+        <view>录入一周课程</view>
+      </button>
+    </view>
+  </view>
+
+  <view class="flow card">
+    <view class="flow-item">
+      <view class="flow-badge input">1</view>
+      <view>
+        <view class="flow-title">录入</view>
+        <view class="muted">任务和课程</view>
+      </view>
+    </view>
+    <view class="flow-item">
+      <view class="flow-badge rank">2</view>
+      <view>
+        <view class="flow-title">分级</view>
+        <view class="muted">紧急和重要</view>
+      </view>
+    </view>
+    <view class="flow-item">
+      <view class="flow-badge move">3</view>
+      <view>
+        <view class="flow-title">推进</view>
+        <view class="muted">拆解和提醒</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>任务雷达</text>
+      <text class="muted">{{tasks.length}} 项</text>
+    </view>
+    <block wx:if="{{tasks.length}}">
+      <block wx:for="{{tasks}}" wx:key="id">
+        <view class="task card {{item.doneClass}} level-{{item.level.key}}" bindtap="selectTask" data-id="{{item.id}}">
+          <view class="task-main">
+            <view class="task-head">
+              <text class="task-title">{{item.title}}</text>
+              <text class="pill {{item.level.className}}">{{item.level.text}}</text>
+            </view>
+            <view class="task-meta">
+              <text>{{item.type}}</text>
+              <text wx:if="{{item.course}}"> · {{item.course}}</text>
+              <text> · {{item.dueDate}} {{item.dueTime}}</text>
+            </view>
+            <view class="bar">
+              <view class="bar-fill" style="width: {{item.progress}}%;"></view>
+            </view>
+            <view class="card-actions">
+              <button class="icon-btn" catchtap="openEditorById" data-id="{{item.id}}">修改任务</button>
+              <button class="icon-btn remove" catchtap="deleteTaskById" data-id="{{item.id}}">删除任务</button>
+            </view>
+          </view>
+          <view class="task-side">
+            <text class="{{item.hotClass}}">{{item.left}}</text>
+            <view>天</view>
+          </view>
+        </view>
+      </block>
+    </block>
+    <view class="empty-task card" wx:else>
+      <view class="empty-title">还没有任务</view>
+      <view class="muted">先点“新建任务”录入一个截止任务，系统会自动分级并生成拆解计划。</view>
+    </view>
+  </view>
+
+  <view class="detail card" wx:if="{{activeTask}}">
+    <view class="detail-head">
+      <view>
+        <view class="detail-title">{{activeTask.title}}</view>
+        <view class="muted">{{activeTask.dueDate}} {{activeTask.dueTime}} 截止</view>
+      </view>
+      <switch checked="{{activeTask.done}}" bindchange="toggleDone" />
+    </view>
+    <view class="detail-actions">
+      <button class="mini-btn" bindtap="openEditor">编辑任务</button>
+      <button class="mini-btn delete-btn" bindtap="deleteActiveTask">删除任务</button>
+    </view>
+    <view class="section-title small-title">智能拆解</view>
+    <block wx:for="{{activePlan}}" wx:key="name">
+      <view class="step {{item.doneClass}}">
+        <view class="step-dot"></view>
+        <view>
+          <view class="step-name">{{item.name}}</view>
+          <view class="muted">{{item.target}}</view>
+        </view>
+      </view>
+    </block>
+    <view class="section-title small-title">提醒节奏</view>
+    <view class="reminders">
+      <block wx:for="{{activeReminders}}" wx:key="offset">
+        <view class="reminder">{{item.label}} · {{item.time}}</view>
+      </block>
+    </view>
+    <slider min="0" max="100" value="{{activeTask.progress}}" bindchange="changeProgress" activeColor="#146b63" block-color="#146b63" />
+  </view>
+
+  <view class="editor-mask" wx:if="{{showEditor}}">
+    <view class="editor card">
+      <view class="editor-head">
+        <view class="editor-title">{{editorTitle}}</view>
+        <button class="close-btn" bindtap="closeEditor">×</button>
+      </view>
+
+      <view class="field">
+        <text>任务名称</text>
+        <input value="{{editDraft.title}}" data-field="title" bindinput="onEditInput" placeholder="输入任务名称" />
+      </view>
+      <view class="field">
+        <text>课程/来源</text>
+        <input value="{{editDraft.course}}" data-field="course" bindinput="onEditInput" placeholder="如 高等数学、社团、竞赛组" />
+      </view>
+      <view class="field">
+        <text>任务类型</text>
+        <picker mode="selector" range="{{typeOptions}}" value="{{editTypeIndex}}" bindchange="onEditTypeChange">
+          <view class="picker-value">{{editDraft.type}}</view>
+        </picker>
+      </view>
+      <view class="field-row">
+        <view class="field half">
+          <text>截止日期</text>
+          <picker mode="date" value="{{editDraft.dueDate}}" bindchange="onEditDateChange">
+            <view class="picker-value">{{editDraft.dueDate}}</view>
+          </picker>
+        </view>
+        <view class="field half">
+          <text>截止时间</text>
+          <picker mode="time" value="{{editDraft.dueTime}}" bindchange="onEditTimeChange">
+            <view class="picker-value">{{editDraft.dueTime}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="field">
+        <text>重要程度 {{editDraft.importance}}</text>
+        <slider min="1" max="5" step="1" value="{{editDraft.importance}}" bindchange="onEditImportanceChange" activeColor="#146b63" block-color="#146b63" />
+      </view>
+      <view class="field">
+        <text>预计耗时 {{editEstimateLabel}}</text>
+        <slider min="1" max="80" step="1" value="{{editEstimateUnits}}" bindchange="onEditHoursChange" activeColor="#146b63" block-color="#146b63" />
+      </view>
+      <view class="field">
+        <text>当前进度 {{editDraft.progress}}%</text>
+        <slider min="0" max="100" step="5" value="{{editDraft.progress}}" bindchange="onEditProgressChange" activeColor="#146b63" block-color="#146b63" />
+      </view>
+      <view class="switch-row">
+        <text>任务已完成</text>
+        <switch checked="{{editDraft.done}}" bindchange="onEditDoneChange" />
+      </view>
+      <view class="switch-row">
+        <text>加入团队协作</text>
+        <switch checked="{{editDraft.shared}}" bindchange="onEditSharedChange" />
+      </view>
+      <view class="field">
+        <text>提醒时间</text>
+        <checkbox-group bindchange="onReminderChange">
+          <view class="reminder-options">
+            <label class="reminder-option" wx:for="{{reminderOptions}}" wx:key="value">
+              <checkbox value="{{item.value}}" checked="{{item.checked}}" color="#146b63" />
+              <text>{{item.label}}</text>
+            </label>
+          </view>
+        </checkbox-group>
+      </view>
+      <button class="btn save-btn" bindtap="saveEditor">保存修改</button>
+    </view>
+  </view>
+</view>
